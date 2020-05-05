@@ -20,7 +20,7 @@ export default class App extends React.Component {
         let todos = this.state.todos
         todos.unshift({
             id: todos.length + 1,
-            todo: this.state.todoInput,
+            title: this.state.todoInput,
             done: false,
         })
 
@@ -28,6 +28,26 @@ export default class App extends React.Component {
             todos,
             todoInput: '',
         })
+    }
+
+    toggleDone(item) {
+        let todos = this.state.todos
+        todos = todos.map(todo => {
+            if (todo.id == item.id) {
+                todo.done = !todo.done
+            }
+            return todo
+        })
+
+        this.setState({ todos })
+    }
+
+    removeTodo(item) {
+        let todos = this.state.todos
+
+        todos = todos.filter(todo => todo.id !== item.id)
+
+        this.setState({ todos })
     }
 
     componentDidMount() {}
@@ -49,16 +69,23 @@ export default class App extends React.Component {
             <View style={styles.container}>
                 {androidStatusBar}
                 {iosStatusBar}
-                <Header title="Habitzzz" />
+                <Header title="Habits App" />
                 <InputBar
                     textChange={todoInput => this.setState({ todoInput })}
-                    addNewTodo={() => this.addNewTodo}
+                    addNewTodo={() => this.addNewTodo()}
                 />
                 <FlatList
                     data={this.state.todos}
+                    extraData={this.state}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item, index }) => {
-                        return <TodoItem todoItem={item} />
+                        return (
+                            <TodoItem
+                                todoItem={item}
+                                toggleDone={() => this.toggleDone(item)}
+                                removeTodo={() => this.removeTodo(item)}
+                            />
+                        )
                     }}
                 />
             </View>
@@ -73,7 +100,7 @@ const styles = StyleSheet.create({
     },
     iosStatusBar: {
         height: 20,
-        backgroundColor: '#333300',
+        backgroundColor: '#FFCE00',
     },
     titleText: {
         flex: 1,
